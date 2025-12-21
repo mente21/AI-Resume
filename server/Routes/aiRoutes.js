@@ -1,5 +1,5 @@
 import express from "express";
-import protect from "../middlewares/authMiddleware.js";
+import protect from "../Middlewares/authMiddleware.js";
 import { enhanceJobDescription, enhanceProfessionalSummary, uploadResume } from "../controllers/aiController.js";
 
 const aiRouter = express.Router();
