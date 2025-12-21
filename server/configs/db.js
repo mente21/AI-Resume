@@ -1,15 +1,22 @@
 import mongoose from 'mongoose';
 
 
+
+let cached = global.mongoose;
+
+if (!cached) {
+    cached = global.mongoose = { conn: null, promise: null };
+}
+
 const connectDB = async () => {
-    if (mongoose.connections[0].readyState) {
-        return;
+    if (cached.conn) {
+        return cached.conn;
     }
 
-    try {
-        mongoose.connection.on("connected", () => {
-            console.log("Database connected successfully");
-        });
+    if (!cached.promise) {
+        const opts = {
+            bufferCommands: false,
+        };
 
         let mongodbURI = process.env.MONGODB_URL;
         const projectName = 'resume-builder';
@@ -22,15 +29,20 @@ const connectDB = async () => {
             mongodbURI = mongodbURI.slice(0, -1);
         }
 
-        await mongoose
-            .connect(`${mongodbURI}/${projectName}`)
-            .catch((error) => {
-                console.error("Error connecting to MongoDB:", error);
-            });
-
-    } catch (error) {
-        console.error("MongoDB Connection Error:", error);
+        cached.promise = mongoose.connect(`${mongodbURI}/${projectName}`, opts).then((mongoose) => {
+            console.log("Database connected successfully");
+            return mongoose;
+        });
     }
+
+    try {
+        cached.conn = await cached.promise;
+    } catch (e) {
+        cached.promise = null;
+        throw e;
+    }
+
+    return cached.conn;
 };
 
 export default connectDB;

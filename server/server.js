@@ -11,8 +11,17 @@ const app = express()
 const PORT = process.env.PORT || 3000
 
 // db connection
-// db connection
-connectDB()
+// connectDB() - Removed top-level await to avoid race conditions
+
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (error) {
+        console.error("Database connection failed:", error);
+        res.status(500).json({ message: "Database connection failed" });
+    }
+});
 
 app.use(express.json())
 app.use(cors())
