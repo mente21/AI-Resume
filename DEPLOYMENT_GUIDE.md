@@ -43,4 +43,7 @@ This guide describes how to deploy your **Client** (Vite + React) and **Server**
 ## Troubleshooting
 - **CORS Errors**: If you see CORS errors in the console, you might need to update the `cors` configuration in `server/server.js` to explicitly allow your Vercel Client URL.
     - Current: `app.use(cors())` (Allows all, so it should work out of the box).
-- **500 Errors**: Check the Vercel "Logs" tab for the Server project to see crash reports.
+- **500 Errors (FUNCTION_INVOCATION_FAILED)**: 
+    - This usually happens if `MONGODB_URL` is missing or incorrect in Vercel Environment Variables.
+    - **Fix**: Go to Vercel Project Settings > Environment Variables, and ensure `MONGODB_URL` is set exactly as it is in your `.env` file.
+    - **Redeploy**: After adding env vars, you MUST redeploy (go to Deployments tab > Redeploy) for them to take effect.
